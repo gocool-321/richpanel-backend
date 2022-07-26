@@ -1,47 +1,53 @@
 const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const { validate, writeToDB } = require("./validators");
-const e = require("express");
-const port = 5000;
+const mongoose = require("mongoose");
+const { v4: uuid } = require("uuid");
+const stripe = require("stripe")(
+  "sk_test_51LPfyrSCPAEv6A9QClDfIdBPFq3aOg5tGZ6aJ6Mm1toKpafwKAZ1nUoN2GqLftG2tX5YDthTo4YmEj6AMI6qYxPl00yte73d1o"
+);
+//uses
+const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
 
-mongoose
-  .connect(
-    "mongodb+srv://gokulsai:gokul@stripeapp.tjrx9.mongodb.net/?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    }
-  )
-  .then(() => console.log("Connected to MongoDB"));
+//TODO:connect to mongoDB
 
-app.get("/login", (req, res) => {
-  console.log(req.body);
-  res.send("ok");
+//routes
+app.get("/", (req, res) => {
+  res.send("<center><h1>Hello, This is backend for stripe API</h1></center>");
 });
 
-app.post("/signup", (req, res) => {
-  console.log(req.body);
-  writeToDB(req.body);
-  res.send("ok");
+app.post("/payments", (req, res) => {
+  const { user, event, product } = req.body;
+
+  return stripe.customers
+    .create({
+      email: user.email,
+      source: event.id,
+    })
+    .then((customer) =>
+      stripe.charges
+        .create(
+          {
+            customer: customer.id, // set the customer id
+            description: product.name,
+            receipt_email: user.email,
+            amount: parseInt(product.amount / 75), // 25
+            currency: "USD",
+          },
+          { idempotencyKey: uuid() }
+        )
+        .then((result) => {
+          console.log(result);
+          res.status(200).json(result);
+        })
+    )
+    .catch((err) => {
+      // Deal with an error
+      console.log(err);
+    });
 });
 
-app.post("/login", (req, res) => {
-  const r = validate(req.body);
-  console.log(r);
-  //   if (r.password === req.body.password) {
-  //     res.send("ok");
-  //   } else {
-  //     res.send("not ok");
-  //   }
-});
-
-app.listen(port, () => {
-  console.log("Server started on port 5000");
-});
+//listen
+app.listen(8282, () => console.log("listening at port 8282"));

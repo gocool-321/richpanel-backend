@@ -1,0 +1,48 @@
+{
+    product: { name: 'Mobile', amount: 1000, currency: 'INR' },
+    user: {
+      given_name: 'Gokul',
+      family_name: 'Sai',
+      nickname: 'gokulsai321',
+      name: 'Gokul Sai',
+      picture: 'https://lh3.googleusercontent.com/a-/AFdZuco4zVl0_YgzCGUDoWIKHhO-cuitMEAB-n4hTSBuzQ=s96-c',
+      locale: 'en',
+      updated_at: '2022-07-26T07:50:15.938Z',
+      email: 'gokulsai321@gmail.com',
+      email_verified: true,
+      sub: 'google-oauth2|112043630063968212216'
+    },
+    event: {
+      id: 'tok_1LPprmSCPAEv6A9QpagM2dCU',
+      object: 'token',
+      card: {
+        id: 'card_1LPprlSCPAEv6A9QvsNVwY6B',
+        object: 'card',
+        address_city: null,
+        address_country: null,
+        address_line1: null,
+        address_line1_check: null,
+        address_line2: null,
+        address_state: null,
+        address_zip: null,
+        address_zip_check: null,
+        brand: 'Visa',
+        country: 'US',
+        cvc_check: 'unchecked',
+        dynamic_last4: null,
+        exp_month: 12,
+        exp_year: 2023,
+        funding: 'credit',
+        last4: '4242',
+        name: 'vepurigokulsaiteja@gmail.com',
+        tokenization_method: null
+      },
+      client_ip: '49.37.144.4',
+      created: 1658850014,
+      email: 'vepurigokulsaiteja@gmail.com',
+      livemode: false,
+      type: 'card',
+      used: false
+    }
+  }
+  product:  { name: 'Mobile', amount: 1000, currency: 'INR' }
