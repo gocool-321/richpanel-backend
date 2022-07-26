@@ -24,10 +24,3 @@ orderSchema = new mongoose.Schema({
 });
 
 exports.orderSchema = orderSchema;
-// userDetailsSchema = new mongoose.Schema({
-//   name: String,
-//   email: String,
-//   password: String,
-// });
-
-// exports.userDetailsSchema = userDetailsSchema;

@@ -5,6 +5,8 @@ const { v4: uuid } = require("uuid");
 const stripe = require("stripe")(
   "sk_test_51LPfyrSCPAEv6A9QClDfIdBPFq3aOg5tGZ6aJ6Mm1toKpafwKAZ1nUoN2GqLftG2tX5YDthTo4YmEj6AMI6qYxPl00yte73d1o"
 );
+
+const { orderModel } = require("./models");
 //uses
 const app = express();
 
@@ -12,41 +14,57 @@ app.use(express.json());
 app.use(cors());
 
 //TODO:connect to mongoDB
+mongoose
+  .connect(
+    "mongodb+srv://gokulsai:gokul@cluster0.2qzq0.mongodb.net/?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    }
+  )
+  .then(() => {
+    console.log("connected to mongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 //routes
 app.get("/", (req, res) => {
   res.send("<center><h1>Hello, This is backend for stripe API</h1></center>");
 });
 
+app.get("/getallorders/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  orderModel.find({ email: id }, (error, data) => {
+    if (error) {
+      res.status(404).json({ error: "data item not found!" });
+    } else {
+      res.json(data);
+    }
+  });
+});
 app.post("/payments", (req, res) => {
   const { user, event, product } = req.body;
-
-  return stripe.customers
-    .create({
-      email: user.email,
-      source: event.id,
+  const orderObject = new orderModel({
+    userId_auth: user.sub,
+    userId_stripe: event.id,
+    cardId: event.card.id,
+    email: user.email,
+    timeStamp: new Date(event.created),
+    planName: product.name,
+    amount: product.amount,
+    currency: product.currency,
+    isCancelled: false,
+  });
+  orderObject
+    .save()
+    .then((result) => {
+      res.json(result);
     })
-    .then((customer) =>
-      stripe.charges
-        .create(
-          {
-            customer: customer.id, // set the customer id
-            description: product.name,
-            receipt_email: user.email,
-            amount: parseInt(product.amount / 75), // 25
-            currency: "USD",
-          },
-          { idempotencyKey: uuid() }
-        )
-        .then((result) => {
-          console.log(result);
-          res.status(200).json(result);
-        })
-    )
-    .catch((err) => {
-      // Deal with an error
-      console.log(err);
-    });
+    .catch((err) => res.status(404).json({ err }));
 });
 
 //listen
