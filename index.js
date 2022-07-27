@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-//TODO:connect to mongoDB
+//connect to mongoDB
 mongoose
   .connect(
     "mongodb+srv://gokulsai:gokul@cluster0.2qzq0.mongodb.net/?retryWrites=true&w=majority",
@@ -46,6 +46,34 @@ app.get("/getallorders/:id", (req, res) => {
     }
   });
 });
+
+app.get("/getorderbystripeId/:id", (req, res) => {
+  const { id } = req.params;
+  orderModel.findOne({ userId_stripe: id }, (error, data) => {
+    if (error) {
+      res.status(404).json({ error: "data item not found!" });
+    } else {
+      console.log(data);
+      res.json(data);
+    }
+  });
+});
+
+app.patch("/cancelorder/:id", (req, res) => {
+  const { id } = req.params;
+  orderModel.findOneAndUpdate(
+    { userId_stripe: id },
+    { isCancelled: true },
+    (error, data) => {
+      if (error) {
+        res.status(404).json({ error: "data item not found!" });
+      } else {
+        res.json(data);
+      }
+    }
+  );
+});
+
 app.post("/payments", (req, res) => {
   const { user, event, product } = req.body;
   const orderObject = new orderModel({
